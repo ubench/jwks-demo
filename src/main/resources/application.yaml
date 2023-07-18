@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: UBench JWKS Demo
+  profiles:
+    active: #spring.profiles.active#
+
+server:
+  port: 8081
+
+ubench:
+  auth:
+    client-id: your-client-id
+    host: https://ubench-authentication-server
+    realm: ubench-api
+  key:
+    path: /path/to/your/private-key.pem
