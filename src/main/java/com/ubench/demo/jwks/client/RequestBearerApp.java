@@ -10,10 +10,12 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import lombok.extern.log4j.Log4j2;
-import com.ubench.demo.jwks.client.response.AccessTokenResponse;
+import reactor.core.publisher.Mono;
 import com.ubench.demo.jwks.client.component.SignedJwtComponent;
+import com.ubench.demo.jwks.client.response.AccessTokenResponse;
 
 @SpringBootApplication
 @ComponentScan({
@@ -25,6 +27,7 @@ import com.ubench.demo.jwks.client.component.SignedJwtComponent;
 public class RequestBearerApp implements CommandLineRunner {
 
    private final SignedJwtComponent signedJwtComponent;
+   private final WebClient.Builder webClientBuilder;
 
    @Value("${ubench.auth.client-id}")
    private String clientId;
@@ -36,8 +39,23 @@ public class RequestBearerApp implements CommandLineRunner {
    private String authRealm;
 
    @Autowired
-   public RequestBearerApp(final SignedJwtComponent signedJwtComponent) {
+   public RequestBearerApp(final SignedJwtComponent signedJwtComponent,
+                           final WebClient.Builder webClientBuilder) {
       this.signedJwtComponent = signedJwtComponent;
+      this.webClientBuilder = webClientBuilder;
+   }
+
+   public Mono<AccessTokenResponse> getAccessToken(final MultiValueMap<String, String> formData) {
+      return webClientBuilder
+            .baseUrl(authHost)
+            .build()
+            .post()
+            .uri(uriBuilder->uriBuilder
+                  .path("/auth/realms/{realm}/protocol/openid-connect/token")
+                  .build(authRealm))
+            .body(BodyInserters.fromFormData(formData))
+            .retrieve()
+            .bodyToMono(AccessTokenResponse.class);
    }
 
    @Override
@@ -47,31 +65,24 @@ public class RequestBearerApp implements CommandLineRunner {
 
       final String jwtString = signedJwtComponent.generateSignedJwt();
 
-      final var restTemplate = new RestTemplate();
-
-      final MultiValueMap<String, String> requestMap = new LinkedMultiValueMap<>();
-      requestMap.add("grant_type", "client_credentials");
-      requestMap.add("client_id", clientId);
-      requestMap.add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-      requestMap.add("client_assertion", jwtString);
+      final MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+      formData.add("grant_type", "client_credentials");
+      formData.add("client_id", clientId);
+      formData.add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+      formData.add("client_assertion", jwtString);
 
       log.debug("Sending this information to the UBench authentication server:");
-      log.debug(requestMap.entrySet()
-            .stream()
-            .map(entry-> entry.getKey() + "=" + entry.getValue().get(0))
-            .collect(Collectors.joining("&")));
+      log.debug(formData.entrySet()
+                        .stream()
+                        .map(entry->entry.getKey() + "=" + entry.getValue().get(0))
+                        .collect(Collectors.joining("&")));
 
-      final var response = restTemplate.postForEntity(String.format("%s/auth/realms/%s/protocol/openid-connect/token", authHost, authRealm),
-                                                      requestMap,
-                                                      AccessTokenResponse.class);
-
-      log.info(response.getStatusCode());
-      log.info(response.getBody().getAccessToken());
+      final var accessToken = getAccessToken(formData).block();
+      log.info(accessToken.getAccessToken());
 
    }
 
-
-   public static void main(String[] args)  {
+   public static void main(String[] args) {
 
       new SpringApplicationBuilder(RequestBearerApp.class)
             .web(WebApplicationType.NONE)
