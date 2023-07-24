@@ -12,7 +12,7 @@ Because you generate your own private key, you are the only one who can sign the
 with which you request an authorization code to access the UBench API.
 Moreover, the private key doesn't leave your server. Only the public key is used by the UBench authentication server to verify the signature of the JWT token. 
 This way, even without knowing the private key and without exchanging passwords, UBench can
-verify that the authentication request is coming from you and not from someone else.
+verify that the authentication request is coming from you and not someone else.
 
 To be even more secure, the private key can be rotated on a regular (or irregular) basis. 
 This way, even in the event that your private key is compromised, the damage is limited to
@@ -151,7 +151,7 @@ On windows, use the following command:
 The public key will be available at http://localhost:8081/.well-known/jwks.json
 
 Make this url available on a public accessible server and send the url to the UBench team.
-They then can configure your client to fetch your public key from this url. The UBench auth
+They can then configure their client to fetch your public key from this url. The UBench auth
 server will use this key to verify whether the signed JWT token - which you will generate in
 a moment - is valid.
 
@@ -206,7 +206,7 @@ python -m ubench.jwks.serve --read-key=/path/to/your/private_key.pem
 The public key will be available at http://localhost:8081/.well-known/jwks.json
 
 Make this url available on a public accessible server and send the url to the UBench team.
-They then can configure your client to fetch your public key from this url. The UBench auth
+They can then configure their client to fetch your public key from this url. The UBench auth
 server will use this key to verify whether the signed JWT token - which you will generate in
 a moment - is valid.
 
@@ -230,7 +230,7 @@ Setting up a jwks server is the preferred and easiest way to authenticate with U
 not required to set up a separate server: you could even encorporate it in your backend that
 communicates with the UBench server. 
 
-If it's really not possible to set up a jwks server, you can send your public key 
+If it's impossible to set up a jwks server, you can send your public key 
 to the UBench team. They will statically configure the authentication server to use your public key to verify the signature of the JWT token.
 **Never send the private key to anyone!**
 
