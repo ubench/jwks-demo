@@ -6,6 +6,7 @@ import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,7 +70,7 @@ public class SignedJwtComponent {
                 .subject(clientId)
                 .audience(String.format("%s/auth/realms/%s/protocol/openid-connect/token", authHost, authRealm))
                 .issueTime(new Date())
-                .expirationTime(new Date(new Date().getTime() + 300 * 1000)) // 5 minutes from now
+                .expirationTime(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5)))
                 .build();
 
         return new SignedJWT(header, claims);
