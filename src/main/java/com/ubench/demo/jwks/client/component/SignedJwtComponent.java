@@ -47,17 +47,16 @@ public class SignedJwtComponent {
     public String generateSignedJwt() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException, JOSEException {
         final var privateKey = privatePemComponent.readPrivateKey(privateKeyPemFile);
         final SignedJWT signedJWT = createJWTToken(privateKey);
-        signJWTTokenWithRSASignature(privateKey, signedJWT);
+        signJWTTokenWithRSASignature(signedJWT, privateKey);
         return signedJWT.serialize();
     }
 
-    private void signJWTTokenWithRSASignature(RSAPrivateCrtKey privateKey, SignedJWT signedJWT) throws JOSEException {
+    private void signJWTTokenWithRSASignature(final SignedJWT signedJWT, final RSAPrivateCrtKey privateKey) throws JOSEException {
         final var signer = new RSASSASigner(privateKey);
         signedJWT.sign(signer);
     }
 
-
-    private SignedJWT createJWTToken(RSAPrivateCrtKey privateKey) throws NoSuchAlgorithmException {
+    private SignedJWT createJWTToken(final RSAPrivateCrtKey privateKey) throws NoSuchAlgorithmException {
         final JWSHeader.Builder headerBuilder = new JWSHeader.Builder(JWSAlgorithm.RS256);
         if (youServeThePublicKeyYourself) {
             headerBuilder.keyID(privatePemComponent.getThumbprint(privateKey.getEncoded()));
