@@ -8,7 +8,7 @@ import com.ubench.demo.jwks.server.component.JwkComponent;
 @RestController
 public class JwksController {
 
-   private JwkComponent jwkComponent;
+   private final JwkComponent jwkComponent;
 
    @Autowired
    public JwksController(final JwkComponent jwkComponent) {
