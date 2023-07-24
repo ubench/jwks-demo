@@ -2,9 +2,11 @@ package com.ubench.demo.jwks.client.component;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,55 +21,58 @@ import com.ubench.demo.jwks.common.PrivatePemComponent;
 @Component
 public class SignedJwtComponent {
 
-   private final PrivatePemComponent privatePemComponent;
+    private final PrivatePemComponent privatePemComponent;
 
-   @Value("${ubench.auth.client-id}")
-   private String clientId;
+    @Value("${ubench.auth.client-id}")
+    private String clientId;
 
-   @Value("${ubench.auth.host}")
-   private String authHost;
+    @Value("${ubench.auth.host}")
+    private String authHost;
 
-   @Value("${ubench.auth.realm}")
-   private String authRealm;
+    @Value("${ubench.auth.realm}")
+    private String authRealm;
 
-   @Value("${ubench.key.path}")
-   public String privateKeyPemFile;
+    @Value("${ubench.key.path}")
+    public String privateKeyPemFile;
 
-   @Autowired
-   public SignedJwtComponent(final PrivatePemComponent privatePemComponent) {
-      this.privatePemComponent = privatePemComponent;
-   }
+    @Value("${ubench.public-key-is-served}")
+    private boolean youServeThePublicKeyYourself;
 
-   public String generateSignedJwt() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException, JOSEException {
-      final var privateKey = privatePemComponent.readPrivateKey(privateKeyPemFile);
+    @Autowired
+    public SignedJwtComponent(final PrivatePemComponent privatePemComponent) {
+        this.privatePemComponent = privatePemComponent;
+    }
 
-      final var header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+    public String generateSignedJwt() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException, JOSEException {
+        final var privateKey = privatePemComponent.readPrivateKey(privateKeyPemFile);
+        final SignedJWT signedJWT = createJWTToken(privateKey);
+        signJWTTokenWithRSASignature(privateKey, signedJWT);
+        return signedJWT.serialize();
+    }
 
-            // Don't set the key ID if you don't serve the public key yourself, but chose to sent it to UBench
-            .keyID(privatePemComponent.getThumbprint(privateKey.getEncoded()))
+    private void signJWTTokenWithRSASignature(RSAPrivateCrtKey privateKey, SignedJWT signedJWT) throws JOSEException {
+        final var signer = new RSASSASigner(privateKey);
+        signedJWT.sign(signer);
+    }
 
-            .build();
 
-      final var claims = new JWTClaimsSet.Builder()
-            .jwtID(UUID.randomUUID().toString())
-            .issuer(clientId)
-            .subject(clientId)
-            .audience(String.format("%s/auth/realms/%s/protocol/openid-connect/token", authHost, authRealm))
-            .issueTime(new Date())
-            .expirationTime(new Date(new Date().getTime() + 300 * 1000)) // 5 minutes from now
-            .build();
+    private SignedJWT createJWTToken(RSAPrivateCrtKey privateKey) throws NoSuchAlgorithmException {
+        final JWSHeader.Builder headerBuilder = new JWSHeader.Builder(JWSAlgorithm.RS256);
+        if (youServeThePublicKeyYourself) {
+            headerBuilder.keyID(privatePemComponent.getThumbprint(privateKey.getEncoded()));
+        }
+        final var header = headerBuilder.build();
 
-      // Create the RSA-signer with the private key
-      final var signer = new RSASSASigner(privateKey);
+        final var claims = new JWTClaimsSet.Builder()
+                .jwtID(UUID.randomUUID().toString())
+                .issuer(clientId)
+                .subject(clientId)
+                .audience(String.format("%s/auth/realms/%s/protocol/openid-connect/token", authHost, authRealm))
+                .issueTime(new Date())
+                .expirationTime(new Date(new Date().getTime() + 300 * 1000)) // 5 minutes from now
+                .build();
 
-      // Prepare the JWT object
-      final var signedJWT = new SignedJWT(header, claims);
-
-      // Compute the RSA signature on the JWT
-      signedJWT.sign(signer);
-
-      // Serialize the signed JWT to a compact format
-      return signedJWT.serialize();
-   }
+        return new SignedJWT(header, claims);
+    }
 
 }
