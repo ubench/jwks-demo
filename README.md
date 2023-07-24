@@ -2,7 +2,7 @@
 To send requests to the UBench API, you need to authenticate yourself. To do so, you need to
 request an authorization token from the UBench authentication server which can be used as
 Bearer authorization. The UBench API will verify this Bearer token with the UBench
-authentication server. If the token is valid, the request will be processed.
+authentication server. If the token is valid, the request will be processed..
 
 There are several ways to authenticate with the UBench authentication server, all involving
 the use of JWT tokens. The JWT format is defined by [IETF](https://ietf.org/) specification 
