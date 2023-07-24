@@ -17,6 +17,6 @@ public class JwksController {
 
    @GetMapping(path = "/.well-known/jwks.json", produces = "application/json")
    public String jwks() {
-      return "{\"keys\": [" + jwkComponent.asJson() + "]}";
+      return "{\"keys\": [" + jwkComponent.generateJWKasJson() + "]}";
    }
 }
