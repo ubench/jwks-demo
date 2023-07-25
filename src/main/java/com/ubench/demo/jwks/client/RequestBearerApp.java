@@ -44,8 +44,20 @@ public class RequestBearerApp implements CommandLineRunner {
       this.signedJwtComponent = signedJwtComponent;
       this.webClientBuilder = webClientBuilder;
    }
+   @Override
+   public void run(String... args) throws Exception {
 
-   public Mono<AccessTokenResponse> getAccessToken(final MultiValueMap<String, String> formData) {
+      log.info("Using auth host: {}, realm {} and clientid {}", authHost, authRealm, clientId);
+
+      final String jwtString = signedJwtComponent.generateSignedJwt();
+      final MultiValueMap<String, String> formData = prepareRequestData(jwtString);
+      logRequestData(formData);
+
+      final var response = retrieveAccessToken(formData).block();
+      log.info(response.getAccessToken());
+   }
+
+   public Mono<AccessTokenResponse> retrieveAccessToken(final MultiValueMap<String, String> formData) {
       return webClientBuilder
             .baseUrl(authHost)
             .build()
@@ -58,32 +70,24 @@ public class RequestBearerApp implements CommandLineRunner {
             .bodyToMono(AccessTokenResponse.class);
    }
 
-   @Override
-   public void run(String... args) throws Exception {
-
-      log.info("Using auth host: {}, realm {} and clientid {}", authHost, authRealm, clientId);
-
-      final String jwtString = signedJwtComponent.generateSignedJwt();
-
-      final MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-      formData.add("grant_type", "client_credentials");
-      formData.add("client_id", clientId);
-      formData.add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-      formData.add("client_assertion", jwtString);
-
+   private void logRequestData(MultiValueMap<String, String> formData) {
       log.debug("Sending this information to the UBench authentication server:");
       log.debug(formData.entrySet()
                         .stream()
                         .map(entry->entry.getKey() + "=" + entry.getValue().get(0))
                         .collect(Collectors.joining("&")));
+   }
 
-      final var accessToken = getAccessToken(formData).block();
-      log.info(accessToken.getAccessToken());
-
+   private MultiValueMap<String, String> prepareRequestData(String jwtString) {
+      final var formData = new LinkedMultiValueMap<String, String>();
+      formData.add("grant_type", "client_credentials");
+      formData.add("client_id", clientId);
+      formData.add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+      formData.add("client_assertion", jwtString);
+      return formData;
    }
 
    public static void main(String[] args) {
-
       new SpringApplicationBuilder(RequestBearerApp.class)
             .web(WebApplicationType.NONE)
             .run(args);

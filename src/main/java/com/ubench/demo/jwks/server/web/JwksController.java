@@ -8,7 +8,7 @@ import com.ubench.demo.jwks.server.component.JwkComponent;
 @RestController
 public class JwksController {
 
-   private JwkComponent jwkComponent;
+   private final JwkComponent jwkComponent;
 
    @Autowired
    public JwksController(final JwkComponent jwkComponent) {
@@ -17,6 +17,6 @@ public class JwksController {
 
    @GetMapping(path = "/.well-known/jwks.json", produces = "application/json")
    public String jwks() {
-      return "{\"keys\": [" + jwkComponent.asJson() + "]}";
+      return "{\"keys\": [" + jwkComponent.generateJWKasJson() + "]}";
    }
 }

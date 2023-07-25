@@ -14,3 +14,4 @@ ubench:
     realm: ubench-api
   key:
     path: /path/to/your/private-key.pem
+  public-key-is-served: true
