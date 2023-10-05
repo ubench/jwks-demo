@@ -101,7 +101,7 @@ def request_access_token(client_id:str):
         return {}
     else:
         # Add the decoded access_token to the response for debug reasons
-        response_json["access_token_decrypted"] = json.loads(base64.b64decode(response_json["access_token"].split('.')[1]).decode('utf-8'))
+        response_json["access_token_decrypted"] = json.loads(base64.urlsafe_b64decode(response_json["access_token"].split('.')[1] + '==').decode('utf-8'))
         return response_json
 
 
