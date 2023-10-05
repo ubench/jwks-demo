@@ -239,6 +239,12 @@ To generate the public key, use the following command:
 openssl rsa -in private_key.pem -pubout -out public_key.pem
 ```
 This will generate a `public_key.pem` file. Send this file to the UBench team.
+
+In this case, to make the demo code work, you must
+
+☕ Java: add the property `ubench.public-key-is-served: false` to the `application.yaml` file.<br/>
+🐍 Python: add the parameter `--no-self-hosted`
+
 > #### _Please note_
 > _If you send the public part of your key to UBench, you'll have to take the following remarks 
 >  into account:_

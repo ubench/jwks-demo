@@ -9,12 +9,13 @@ import rich
 from jwcrypto import jwk, jwt
 from datetime import datetime as dt
 
-opts, args = getopt.getopt(sys.argv[1:], "", ["auth-host=", "realm=", "client-id=", "key-path="])
+opts, args = getopt.getopt(sys.argv[1:], "", ["auth-host=", "realm=", "client-id=", "key-path=", "no-self-hosted"])
 
 auth_host:str = None
 realm:str = None
 client_id:str = None
 key_path:str = None
+self_hosted:bool = True
 
 for opt, arg in opts:
     if opt in ("--auth-host"):
@@ -25,6 +26,8 @@ for opt, arg in opts:
         client_id = arg
     elif opt in ("--key-path"):
         key_path = arg
+    elif opt in ("--no-self-hosted"):
+        self_hosted = False
 
 if auth_host is None:
     raise Exception("UBench authentication server host not specified: Use --auth-host=<auth-host>")
@@ -63,7 +66,7 @@ def generate_signed_jwt(client_id):
         'alg': 'RS256',
 
         # Don't set the key ID if you don't serve the public key yourself, but chose to sent it to UBench
-        'kid': key.get('kid'),
+        'kid': key.get('kid') if self_hosted else None,
     }
 
     jwt_claims = {
