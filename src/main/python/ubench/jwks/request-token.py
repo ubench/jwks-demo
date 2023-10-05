@@ -46,7 +46,7 @@ if not os.path.isfile(key_path):
     raise Exception(f"\nprivate pem key not found in {key_path}.\nPlease generate one with `openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out {key_path}`")
 
 
-with open("../resources/private_key.pem") as f:
+with open(key_path) as f:
     pem_data = f.read()
 f.closed
 
