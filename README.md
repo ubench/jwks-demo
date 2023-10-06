@@ -169,12 +169,12 @@ a bearer token is generated and returned by the UBench authentication server.
 If you use the `application-dev.yaml` file, add `-Pdev` to the command.
 
 ```bash
-./mvnw spring-boot:run -Prequest-token
+./mvnw spring-boot:run -Prequest-bearer
 ```
 
 On windows, use the following command:
 ```powershell
-.\mvnw.cmd spring-boot:run -Prequest-token
+.\mvnw.cmd spring-boot:run -Prequest-bearer
 ```
 
 ## 🐍 Python implementation
@@ -222,7 +222,7 @@ Change `auth-host`, `client-id` according to the information you got from UBench
 Change `key-path` to the path of your private key.
 
 ```bash
-python -m ubench.jwks.request-token --auth-host=https://approval.ubenchinternational.com --realm=ubench-api --client-id=your-client-id --key-path=/path/to/your/private_key.pem
+python -m ubench.jwks.request-bearer --auth-host=https://approval.ubenchinternational.com --realm=ubench-api --client-id=your-client-id --key-path=/path/to/your/private_key.pem
 ```
 
 ## What if I can't serve a jwks server?
@@ -251,5 +251,5 @@ In this case, to make the demo code work, you must
 > * _When you need or want to change your public key, you'll have to send the accompanying 
 > public key to UBench. Only when the new public key is configured, you can take your private 
 > key in production. Serving the JWK key publicly is easier to maintain and guarantee uptime._
-> * _Do not use the key id in the header of the signed JWT token. See the comment in 
-> `com.ubench.demo.jwks.client.component.SignedJwtComponent` and `request-token.py`_
+> * _Do not use the key id in the header of the signed JWT token. See parameter `ubench.public-key-is-served` in 
+> `com.ubench.demo.jwks.client.component.SignedJwtComponent` and parameter `no-self-hosted` in `request-bearer.py`_
