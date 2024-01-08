@@ -51,7 +51,7 @@ if not os.path.isfile(key_path):
 
 with open(key_path) as f:
     pem_data = f.read()
-f.closed
+    f.close()
 
 pem_data_encode = pem_data.encode("utf-8")
 key = jwk.JWK.from_pem(pem_data_encode)
