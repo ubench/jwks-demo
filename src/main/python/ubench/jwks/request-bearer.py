@@ -97,7 +97,7 @@ def request_access_token(client_id:str):
         'client_assertion': signed_jwt,
     }
 
-    response = requests.post(token_endpoint, data=data)
+    response = requests.post(token_endpoint, data=data, timeout=30)
     response_json = json.loads(response.text)
     if response.status_code != 200:
         rich.print_json(data=response_json)
