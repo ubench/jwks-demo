@@ -12,6 +12,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Mono;
 import com.ubench.demo.jwks.client.component.SignedJwtComponent;
@@ -44,6 +45,7 @@ public class RequestBearerApp implements CommandLineRunner {
       this.signedJwtComponent = signedJwtComponent;
       this.webClientBuilder = webClientBuilder;
    }
+
    @Override
    public void run(String... args) throws Exception {
 
@@ -67,7 +69,15 @@ public class RequestBearerApp implements CommandLineRunner {
                   .build(authRealm))
             .body(BodyInserters.fromFormData(formData))
             .retrieve()
-            .bodyToMono(AccessTokenResponse.class);
+            .bodyToMono(AccessTokenResponse.class)
+            .doOnError(error->{
+               if (error instanceof final WebClientResponseException.BadRequest badRequest) {
+                  log.error("Bad request: {}", badRequest.getResponseBodyAsString());
+               } else {
+                  log.error("Error while retrieving access token", error);
+               }
+            })
+            ;
    }
 
    private void logRequestData(MultiValueMap<String, String> formData) {
