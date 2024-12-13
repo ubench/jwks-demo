@@ -65,7 +65,7 @@ def generate_signed_jwt(client_id):
     jwt_header = {
         'alg': 'RS256',
 
-        # Don't set the key ID if you don't serve the public key yourself, but chose to sent it to UBench
+        # Only set the key ID if you serve the public key yourself using your own JWKS server
         'kid': key.get('kid') if self_hosted else None,
     }
 
@@ -94,7 +94,7 @@ def request_access_token(client_id:str):
         'grant_type': 'client_credentials',
         'client_id': client_id,
         'client_assertion_type': 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-        'client_assertion': signed_jwt,
+        'client_assertion': signed_jwt
     }
 
     response = requests.post(token_endpoint, data=data, timeout=30)

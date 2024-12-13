@@ -31,5 +31,6 @@ build/
 ### VS Code ###
 .vscode/
 *.pem
+*.pub
 application-dev.yaml
 __pycache__/
