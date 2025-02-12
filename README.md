@@ -28,6 +28,10 @@ It uses your private key and generates the public key on the fly. This way, the 
 is to generate a (new) private key and put it in the correct folder. The jwks server will take care of the rest.
 
 - [Prerequisites](#prerequisites)
+- [Server information](#server-information)
+- [Content of the messages](#content-of-the-messages)
+  - [Requesting a bearer token](#requesting-a-bearer-token)
+  - [Response of the UBench authentication server](#response-of-the-ubench-authentication-server)
 - [☕ Java implementation](#-java-implementation)
   - [tl;dr](#tldr)
   - [Configuration](#configuration)
@@ -116,6 +120,68 @@ You are free to use any of the following [JWA algorithms](https://datatracker.ie
      level of security among the PS algorithms.
    </details>
 
+## Server information
+This README uses https://approval.ubenchinternational.com as the UBench authentication server.
+For production, you should use https://www.ubench.com
+
+## Content of the messages
+To make sure that the UBench authentication server can verify the JWT token, it is important that the messages you're sending contain the correct information.
+
+### Requesting a bearer token
+The message that you use to request the bearer token, contains the following information:
+* `grant_type`: the grant type you want to use. For the UBench API, you must use `client_credentials`
+* `client_id`: the client id you got from UBench
+* `client_assertion_type`: the type of assertion you use. For the UBench API, you should use `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`
+* `client_assertion`: the signed JWT token. This token is signed with your private key and can be verified by the UBench authentication server using your public key.
+
+An example json content of the message:
+```json
+{
+  "grant_type": "client_credentials",
+  "client_id": "ws-your-client-id-1234-5678-90ab-cdef01234567",
+  "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+  "client_assertion": "signed-jwt-token"
+}
+```
+
+#### Signed JWT token <!-- omit in toc -->
+You can see that the message contains a signed JWT token as `client_assertion`. This token is signed with your private key. The UBench authentication server will use your public key to verify the signature of the JWT token.
+
+The JWT token contains three parts: the header, the payload, and the signature.
+
+The header of the signed JWT token contains the following information:
+* `alg`: the algorithm used to sign the JWT token. For the UBench API, you should use `RS256`
+* `kid`: the key id of the key used to sign the JWT token. This is only required if you serve the public key yourself. If you send the public key to UBench, you must omit this field.
+
+
+The payload or claim of the signed JWT token contains the following information:
+* `jti`: a unique identifier for the token that you can generate yourself, randomly
+* `iss`: the client id you got from UBench
+* `sub`: the client id you got from UBench
+* `aud`: the audience of the token. This is the URL of the UBench authentication server
+* `iat`: the time the token was issued. This is a timestamp in seconds since the epoch.
+* `exp`: the expiration time of the token. This is a timestamp in seconds since the epoch and must be after the `iat` time.
+
+An example json content of the signed JWT token:
+```json
+{
+  "jti": "unique-private-key-identifier",
+  "iss": "ws-your-client-id-1234-5678-90ab-cdef01234567",
+  "aud": "https://approval.ubenchinternational.com/auth/realms/ubench-api/protocol/openid-connect/token",
+  "sub": "ws-your-client-id-1234-5678-90ab-cdef01234567",
+  "iat": 1640991600,
+  "exp": 1640995200
+}
+```
+
+### Response of the UBench authentication server
+The UBench authentication server will respond with a json message containing the following information:
+* `access_token`: the bearer token you can use to authenticate with the UBench API
+* `expires_in`: the time in seconds the bearer token is valid
+* `token_type`: the type of token. For the UBench API, this is `Bearer`
+* `scope`: the scope of the token
+
+As stated, the token that you can find in `access_token` is the bearer token that you can use to authenticate with the UBench API.
 
 ## ☕ Java implementation
 
@@ -132,7 +198,7 @@ project. Set the following properties according to the information you got from 
 ubench:
   auth:
     client-id: your-ubench-client-id
-    host: https://ubench-authentication-server
+    host: https://approval.ubenchinternational.com
   key:
     path: /path/to/your/private_key.pem
 ```    
