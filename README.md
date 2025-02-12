@@ -38,6 +38,11 @@ is to generate a (new) private key and put it in the correct folder. The jwks se
   - [Prerequisites](#prerequisites-1)
   - [Serve a key](#serve-a-key)
   - [Request an authorization token](#request-an-authorization-token)
+- [🟨 Node.js implementation](#-nodejs-implementation)
+  - [tl;dr](#tldr-2)
+  - [Prerequisites](#prerequisites-2)
+  - [Serve a key](#serve-a-key-1)
+  - [Request an authorization token](#request-an-authorization-token-1)
 - [What if I can't serve a jwks server?](#what-if-i-cant-serve-a-jwks-server)
 
 
@@ -225,6 +230,55 @@ Change `key-path` to the path of your private key.
 python -m ubench.jwks.request-bearer --auth-host=https://approval.ubenchinternational.com --realm=ubench-api --client-id=your-client-id --key-path=/path/to/your/private_key.pem
 ```
 
+## 🟨 Node.js implementation
+
+### tl;dr
+* JWKS server inspiration in `src/main/nodejs/serve.js`
+* Request bearer token inspiration in `src/main/nodejs/request-bearer.js`
+
+### Prerequisites
+Install the necessary Node.js packages using yarn:
+```bash
+# Install node dependencies
+cd src/main/nodejs
+yarn install
+```
+
+The following commands must be executed in the folder `src/main/nodejs`
+
+### Serve a key
+> #### _Warning_
+> _This is a demo implementation and not intended for production use._
+> _Use this code for testing purposes and as inspiration for your own implementation._
+
+To launch the demo implementation, you can use the following command:
+
+```bash
+yarn serve -- --read-key=/path/to/your/private_key.pem
+```
+
+The public key will be available at http://localhost:8085/.well-known/jwks.json
+
+Make this url available on a public accessible server and send the url to the UBench team.
+They can then configure their client to fetch your public key from this url. The UBench auth
+server will use this key to verify whether the signed JWT token - which you will generate in
+a moment - is valid.
+
+### Request an authorization token
+When the URL to the jkws server is known and configured by UBench, you can use the following
+command to request an authorization token. The command will generate a signed JWT token using
+the private key you previously generated, then send it to the
+UBench authentication server. This server will contact your jwks server to download the
+public key, then verify the signature of the signed JWT token. If verification is successful,
+a bearer token is generated and returned by the UBench authentication server.
+
+Change `auth-host`, `client-id` according to the information you got from UBench.
+Change `key-path` to the path of your private key.
+
+```bash
+yarn request-bearer --auth-host=https://approval.ubenchinternational.com --realm=ubench-api --client-id=your-client-id --key-path=/path/to/your/private_key.pem
+```
+
 ## What if I can't serve a jwks server?
 Setting up a jwks server is the preferred and easiest way to authenticate with UBench. It's
 not required to set up a separate server: you could even encorporate it in your backend that
@@ -243,7 +297,8 @@ This will generate a `public_key.pem` file. Send this file to the UBench team.
 In this case, to make the demo code work, you must
 
 ☕ Java: add the property `ubench.public-key-is-served: false` to the `application.yaml` file.<br/>
-🐍 Python: add the parameter `--no-self-hosted`
+🐍 Python: add the parameter `--no-self-hosted`<br/>
+🟨 NodeJS: add the parameter `--no-self-hosted`<br/>
 
 > #### _Please note_
 > _If you send the public part of your key to UBench, you'll have to take the following remarks 

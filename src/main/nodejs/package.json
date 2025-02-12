@@ -1,0 +1,19 @@
+{
+  "name": "jwks-server",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "serve": "node serve.js",
+    "request-bearer": "node request-bearer.js"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "express": "^4.21.2",
+    "jwks-server": "file:",
+    "node-fetch": "^3.3.2",
+    "node-jose": "^2.2.0",
+    "uuid": "^9.0.1",
+    "yargs": "^17.7.2"
+  }
+}
