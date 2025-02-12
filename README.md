@@ -148,7 +148,7 @@ On windows, use the following command:
 .\mvnw.cmd spring-boot:run -Pserve
 ```
 
-The public key will be available at http://localhost:8081/.well-known/jwks.json
+The public key will be available at http://localhost:8085/.well-known/jwks.json
 
 Make this url available on a public accessible server and send the url to the UBench team.
 They can then configure their client to fetch your public key from this url. The UBench auth
@@ -203,7 +203,7 @@ To launch the demo implementation, you can use the following command:
 python -m ubench.jwks.serve --read-key=/path/to/your/private_key.pem
 ```
 
-The public key will be available at http://localhost:8081/.well-known/jwks.json
+The public key will be available at http://localhost:8085/.well-known/jwks.json
 
 Make this url available on a public accessible server and send the url to the UBench team.
 They can then configure their client to fetch your public key from this url. The UBench auth

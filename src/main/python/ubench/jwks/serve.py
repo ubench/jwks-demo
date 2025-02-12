@@ -60,4 +60,4 @@ console.print("This server is for demo purposes only. Do not use as is in produc
 
 # Run the Flask application
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8081)
+    app.run(host='0.0.0.0', port=8085)
