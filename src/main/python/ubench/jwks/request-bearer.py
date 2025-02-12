@@ -97,14 +97,22 @@ def request_access_token(client_id:str):
         'client_assertion': signed_jwt
     }
 
+    data_to_print = data.copy()
+    data_to_print['__client_assertion_content'] = json.loads(base64.urlsafe_b64decode(data["client_assertion"].split('.')[1] + '==').decode('utf-8'))
+
+    rich.print("[yellow]Requesting access token using this message:")
+    rich.print_json(data=data_to_print)
+
+
     response = requests.post(token_endpoint, data=data, timeout=30)
     response_json = json.loads(response.text)
     if response.status_code != 200:
+        rich.print("[red]Failed to get access token")
         rich.print_json(data=response_json)
         return {}
     else:
         # Add the decoded access_token to the response for debug reasons
-        response_json["access_token_decrypted"] = json.loads(base64.urlsafe_b64decode(response_json["access_token"].split('.')[1] + '==').decode('utf-8'))
+        response_json["__access_token_content"] = json.loads(base64.urlsafe_b64decode(response_json["access_token"].split('.')[1] + '==').decode('utf-8'))
         return response_json
 
 
@@ -112,6 +120,7 @@ def request_access_token(client_id:str):
 if __name__ == '__main__':
     signed_jwt = request_access_token(client_id)
     if signed_jwt: 
+        rich.print("\n[yellow]Successfully got access token")
         rich.print_json(data=signed_jwt)
 
     jwt_token_to_use_as_bearer = signed_jwt.get('access_token', None)
