@@ -7,7 +7,7 @@ authentication server. If the token is valid, the request will be processed.
 There are several ways to authenticate with the UBench authentication server, all involving
 the use of JWT tokens. The JWT format is defined by [IETF](https://ietf.org/) specification 
 [RFC 7519](https://tools.ietf.org/html/rfc7519). The preferred
-way is using a public/private key authentication. Doing so, UBench can guarantee your data safety. 
+way is **using a public/private key authentication**. Doing so, UBench can guarantee your data safety. 
 Because you generate your own private key, you are the only one who can sign the JWT token
 with which you request an authorization code to access the UBench API.
 Moreover, the private key doesn't leave your server. Only the public key is used by the UBench authentication server to verify the signature of the JWT token. 
@@ -18,8 +18,8 @@ To be even more secure, the private key can be rotated on a regular (or irregula
 This way, even in the event that your private key is compromised, the damage is limited to
 the period between the last rotation and the moment the key was compromised.
 
-By serving the public part of the key using a jwks server, you never have to notify UBench
-that you changed your private key. Whenever you decide to rotate your private key, you can
+By serving the public part of the key using a jwks server, **you never have to notify UBench
+that you changed your private key**. Whenever you decide to rotate your private key, you can
 update the public key on your server. UBench will automatically use the new key to verify 
 the signature of the JWT token.
 
@@ -32,18 +32,19 @@ is to generate a (new) private key and put it in the correct folder. The jwks se
   - [tl;dr](#tldr)
   - [Configuration](#configuration)
   - [Serve the public key](#serve-the-public-key)
-  - [Request bearer token from the UBench auth server](#request-bearer-token-from-the-ubench-auth-server)
+  - [Request an authorization token](#request-an-authorization-token)
 - [🐍 Python implementation](#-python-implementation)
   - [tl;dr](#tldr-1)
   - [Prerequisites](#prerequisites-1)
   - [Serve a key](#serve-a-key)
-  - [Request an authorization token](#request-an-authorization-token)
+  - [Request an authorization token](#request-an-authorization-token-1)
 - [🟨 Node.js implementation](#-nodejs-implementation)
   - [tl;dr](#tldr-2)
   - [Prerequisites](#prerequisites-2)
   - [Serve a key](#serve-a-key-1)
-  - [Request an authorization token](#request-an-authorization-token-1)
+  - [Request an authorization token](#request-an-authorization-token-2)
 - [What if I can't serve a jwks server?](#what-if-i-cant-serve-a-jwks-server)
+  - [Omit the key id](#omit-the-key-id)
 
 
 ## Prerequisites
@@ -162,7 +163,7 @@ a moment - is valid.
 
 You can find the implementation in `com.ubench.demo.jwks.server.web.JwksController`
 
-### Request bearer token from the UBench auth server
+### Request an authorization token
 
 When the URL to the jkws server is known and configured by UBench, you can use the following
 command to request an authorization token. The command will generate a signed JWT token using
@@ -294,11 +295,13 @@ openssl rsa -in private_key.pem -pubout -out public_key.pem
 ```
 This will generate a `public_key.pem` file. Send this file to the UBench team.
 
-In this case, to make the demo code work, you must
+### Omit the key id
+It's important that you don't send a key id in the header of the signed JWT token.
+To make the demo code work, **you must**
 
-☕ Java: add the property `ubench.public-key-is-served: false` to the `application.yaml` file.<br/>
-🐍 Python: add the parameter `--no-self-hosted`<br/>
-🟨 NodeJS: add the parameter `--no-self-hosted`<br/>
+* ☕ **Java**: add the property `ubench.public-key-is-served: false` to the `application.yaml` file.<br/>
+* 🐍 **Python**: add the parameter `--no-self-hosted`<br/>
+* 🟨 **NodeJS**: add the parameter `--no-self-hosted`<br/>
 
 > #### _Please note_
 > _If you send the public part of your key to UBench, you'll have to take the following remarks 
