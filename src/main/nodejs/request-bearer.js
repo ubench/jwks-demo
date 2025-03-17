@@ -1,6 +1,7 @@
 import fs from 'fs';
 import jose from 'node-jose';
 import chalk from 'chalk';
+import {colorize} from 'json-colorizer';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import fetch from 'node-fetch';
@@ -83,13 +84,13 @@ async function requestAccessToken(clientId) {
             'client_assertion': signedJwt
         });
 
-        console.log(chalk.yellow('Requesting access token using this message:'));
-        console.log(JSON.stringify({
+        console.log(chalk.cyan('Requesting access token using this message:'));
+        console.log(colorize(JSON.stringify({
             ...Object.fromEntries(data),
             __client_assertion_content: JSON.parse(
                 Buffer.from(signedJwt.split('.')[1], 'base64').toString()
             )
-        }, null, 2));
+        }, null, 2)));
 
         const response = await fetch(tokenEndpoint, {
             method: 'POST',
@@ -101,7 +102,7 @@ async function requestAccessToken(clientId) {
 
         if (!response.ok) {
             console.log(chalk.red('Failed to get access token'));
-            console.log(JSON.stringify(responseData, null, 2));
+            console.log(colorize(JSON.stringify(responseData, null, 2)));
             return null;
         }
 
@@ -119,8 +120,6 @@ async function requestAccessToken(clientId) {
 
 const result = await requestAccessToken(clientId);
 if (result) {
-    console.log(chalk.yellow('\nSuccessfully got access token'));
-    console.log(JSON.stringify(result, null, 2));
-} else {
-    console.log(chalk.red('Failed to get access token'));
+    console.log(chalk.cyan('\nSuccessfully got access token'));
+    console.log(colorize(JSON.stringify(result, null, 2)));
 }
