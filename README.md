@@ -351,8 +351,8 @@ Setting up a jwks server is the preferred and easiest way to authenticate with U
 not required to set up a separate server: you could even encorporate it in your backend that
 communicates with the UBench server. 
 
-If it's impossible to set up a jwks server, you can send your public key 
-to the UBench team. They will statically configure the authentication server to use your public key to verify the signature of the JWT token.
+If it's really impossible to set up a jwks server, you can send your public key 
+to the UBench team. They will statically configure the authentication server to use your public key to verify the signature of the JWT token you'll send while [signing the jwt token](#signed-jwt-token) which you have to use in the `client_assertion` in the message to [request the bearer token](#requesting-a-bearer-token).
 **Never send the private key to anyone!**
 
 To generate the public key, use the following command:
@@ -361,13 +361,16 @@ openssl rsa -in private_key.pem -pubout -out public_key.pem
 ```
 This will generate a `public_key.pem` file. Send this file to the UBench team.
 
+> [!IMPORTANT]
+> _Even if you send the public key to UBench instead of hosting a JWKS server, **you still need to request a bearer token** and use it as bearer authentication for your requests to the UBench API. Make sure to inspect the "request a bearer token" demo code in the provided implementations to understand how to properly authenticate with the UBench API._
+
 ### Omit the key id
 It's important that you don't send a key id in the header of the signed JWT token.
-To make the demo code work, **you must**
+To make the request-bearer-token demo code work, **you must**
 
 * ☕ **Java**: add the property `ubench.public-key-is-served: false` to the `application.yaml` file.<br/>
-* 🐍 **Python**: add the parameter `--no-self-hosted`<br/>
-* 🟨 **NodeJS**: add the parameter `--no-self-hosted`<br/>
+* 🐍 **Python**: add the parameter `--no-self-hosted` to the `python -m ubench.jwks.request-bearer` command<br/>
+* 🟨 **NodeJS**: add the parameter `--no-self-hosted` to the `yarn request-bearer` command<br/>
 
 > #### _Please note_
 > _If you send the public part of your key to UBench, you'll have to take the following remarks 
