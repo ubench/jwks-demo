@@ -204,7 +204,7 @@ ubench:
 ```    
 
 ### Serve the public key
-> #### _Warning_
+> [!WARNING]
 > _This is a demo implementation and not intended for production use._
 > _Use this code for testing purposes and as inspiration for your own implementation._
  
@@ -265,7 +265,7 @@ pip install --upgrade flask jwcrypto requests rich
 The following commands must be executed in the folder `src/main/python`
 
 ### Serve a key
-> #### _Warning_
+> [!WARNING]
 > _This is a demo implementation and not intended for production use._
 > _Use this code for testing purposes and as inspiration for your own implementation._
 
@@ -314,7 +314,7 @@ yarn install
 The following commands must be executed in the folder `src/main/nodejs`
 
 ### Serve a key
-> #### _Warning_
+> [!WARNING]
 > _This is a demo implementation and not intended for production use._
 > _Use this code for testing purposes and as inspiration for your own implementation._
 
