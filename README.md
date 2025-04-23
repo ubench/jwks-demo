@@ -361,7 +361,7 @@ openssl rsa -in private_key.pem -pubout -out public_key.pem
 This will generate a `public_key.pem` file. Send this file to the UBench team.
 
 > [!NOTE]
-> _If you send the public part of your key to UBench, and you need or want to change your
+> _If you sent the public part of your key to UBench, and you need or want to change your
 > public key, you'll have to re-send the accompanying public key to UBench. Only when the
 > new public key is configured, you can take your private key in production.
 > There will be down-time during this process. Serving the JWK key publicly is easier 
