@@ -365,8 +365,8 @@ This will generate a `public_key.pem` file. Send this file to the UBench team.
 > _Even if you send the public key to UBench instead of hosting a JWKS server, **you still need to request a bearer token** and use it as bearer authentication for your requests to the UBench API. Make sure to inspect the "request a bearer token" demo code in the provided implementations to understand how to properly authenticate with the UBench API._
 
 ### Omit the key id
-It's important that you don't send a key id in the header of the signed JWT token.
-To make the request-bearer-token demo code work, **you must**
+If you don't use a JWKS server, it's important that you don't send a key id in the header
+of the signed JWT token. To make the request-bearer-token demo code work, **you must**
 
 * ☕ **Java**: add the property `ubench.public-key-is-served: false` to the `application.yaml` file.<br/>
 * 🐍 **Python**: add the parameter `--no-self-hosted` to the `python -m ubench.jwks.request-bearer` command<br/>
