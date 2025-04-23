@@ -372,11 +372,9 @@ To make the request-bearer-token demo code work, **you must**
 * 🐍 **Python**: add the parameter `--no-self-hosted` to the `python -m ubench.jwks.request-bearer` command<br/>
 * 🟨 **NodeJS**: add the parameter `--no-self-hosted` to the `yarn request-bearer` command<br/>
 
-> #### _Please note_
-> _If you send the public part of your key to UBench, you'll have to take the following remarks 
->  into account:_
-> * _When you need or want to change your public key, you'll have to send the accompanying 
-> public key to UBench. Only when the new public key is configured, you can take your private 
-> key in production. Serving the JWK key publicly is easier to maintain and guarantee uptime._
-> * _Do not use the key id in the header of the signed JWT token. See parameter `ubench.public-key-is-served` in 
-> `com.ubench.demo.jwks.client.component.SignedJwtComponent` and parameter `no-self-hosted` in `request-bearer.py`_
+> [!NOTE]
+> _If you send the public part of your key to UBench, and you need or want to change your
+> public key, you'll have to re-send the accompanying public key to UBench. Only when the
+> new public key is configured, you can take your private key in production.
+> There will be down-time during this process. Serving the JWK key publicly is easier 
+> to maintain and to guarantee uptime._
