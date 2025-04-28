@@ -320,7 +320,7 @@ The following commands must be executed in the folder `src/main/nodejs`
 To launch the demo implementation, you can use the following command:
 
 ```bash
-yarn serve -- --read-key=/path/to/your/private_key.pem
+yarn serve --read-key=/path/to/your/private_key.pem
 ```
 
 The public key will be available at http://localhost:8085/.well-known/jwks.json
