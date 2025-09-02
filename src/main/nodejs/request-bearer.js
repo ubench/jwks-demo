@@ -28,14 +28,14 @@ const argv = yargs(hideBin(process.argv))
         type: 'string',
         demandOption: true
     })
-    .option('no-self-hosted', {
-        describe: 'Disable key ID in JWT header',
+    .option('self-hosted', {
+        describe: 'Include key ID in JWT header',
         type: 'boolean',
-        default: false
+        default: true
     })
     .argv;
 
-const { authHost, realm, clientId, keyPath, noSelfHosted } = argv;
+const { authHost, realm, clientId, keyPath, selfHosted } = argv;
 const authUrl = `${authHost}/auth/realms/${realm}`;
 const tokenEndpoint = `${authUrl}/protocol/openid-connect/token`;
 
@@ -50,7 +50,7 @@ async function generateSignedJwt(key, clientId) {
     
     const header = {
         alg: 'RS256',
-        kid: noSelfHosted ? undefined : key.kid
+        kid: selfHosted ? key.kid : undefined
     };
 
     const claims = {
