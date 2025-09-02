@@ -98,7 +98,10 @@ def request_access_token(client_id:str):
     }
 
     data_to_print = data.copy()
-    data_to_print['__client_assertion_content'] = json.loads(base64.urlsafe_b64decode(data["client_assertion"].split('.')[1] + '==').decode('utf-8'))
+    data_to_print['__client_assertion_human_readable'] = {
+        'header': json.loads(base64.urlsafe_b64decode(data["client_assertion"].split('.')[0] + '==').decode('utf-8')),
+        'content': json.loads(base64.urlsafe_b64decode(data["client_assertion"].split('.')[1] + '==').decode('utf-8'))
+    }
 
     rich.print("[yellow]Requesting access token using this message:")
     rich.print_json(data=data_to_print)

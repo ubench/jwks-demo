@@ -87,9 +87,14 @@ async function requestAccessToken(clientId) {
         console.log(chalk.cyan('Requesting access token using this message:'));
         console.log(colorize(JSON.stringify({
             ...Object.fromEntries(data),
-            __client_assertion_content: JSON.parse(
-                Buffer.from(signedJwt.split('.')[1], 'base64').toString()
-            )
+            __client_assertion_human_readable: {
+                header: JSON.parse(
+                    Buffer.from(signedJwt.split('.')[0], 'base64').toString()
+                ),
+                content: JSON.parse(
+                    Buffer.from(signedJwt.split('.')[1], 'base64').toString()
+                )
+            },
         }, null, 2)));
 
         const response = await fetch(tokenEndpoint, {
