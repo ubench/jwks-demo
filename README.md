@@ -303,11 +303,11 @@ python -m ubench.jwks.request-bearer --auth-host=https://approval.ubenchinternat
 * Request bearer token inspiration in `src/main/nodejs/request-bearer.js`
 
 ### Prerequisites
-Install the necessary Node.js packages using yarn:
+Install the necessary Node.js packages using npm:
 ```bash
 # Install node dependencies
 cd src/main/nodejs
-yarn install
+npm install
 ```
 
 The following commands must be executed in the folder `src/main/nodejs`
@@ -320,7 +320,7 @@ The following commands must be executed in the folder `src/main/nodejs`
 To launch the demo implementation, you can use the following command:
 
 ```bash
-yarn serve --read-key=/path/to/your/private_key.pem
+npm run serve -- --read-key=/path/to/your/private_key.pem
 ```
 
 The public key will be available at http://localhost:8085/.well-known/jwks.json
@@ -342,7 +342,7 @@ Change `auth-host`, `client-id` according to the information you got from UBench
 Change `key-path` to the path of your private key.
 
 ```bash
-yarn request-bearer --auth-host=https://approval.ubenchinternational.com --realm=ubench-api --client-id=your-client-id --key-path=/path/to/your/private_key.pem
+npm run request-bearer -- --auth-host=https://approval.ubenchinternational.com --realm=ubench-api --client-id=your-client-id --key-path=/path/to/your/private_key.pem
 ```
 
 ## What if I can't serve a jwks server?
@@ -374,4 +374,4 @@ This will generate a `public_key.pem` file. Send this file to the UBench team.
 > If you don't use a JWKS server, it's important that you don't send a key id in the header of the signed JWT token. To make the request-bearer-token demo code work, **you must**
 >* ☕ **Java**: add the property `ubench.public-key-is-served: false` to the `application.yaml` file.<br/>
 >* 🐍 **Python**: add the parameter `--no-self-hosted` to the `python -m ubench.jwks.request-bearer` command<br/>
->* 🟨 **NodeJS**: add the parameter `--no-self-hosted` to the `yarn request-bearer` command<br/>
+>* 🟨 **NodeJS**: add the parameter `--no-self-hosted` to the `npm run request-bearer --` command<br/>
