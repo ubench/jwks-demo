@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "serve": "node serve.js",
-    "request-bearer": "node request-bearer.js"
+    "request-bearer": "node request-bearer.js",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "chalk": "^6.0.1",
