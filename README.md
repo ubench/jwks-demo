@@ -143,6 +143,37 @@ An example json content of the message:
 }
 ```
 
+#### Retrieving the bearer token manually <!-- omit in toc -->
+To retrieve the bearer token yourself, send the message above as a form-encoded `POST` request to the token endpoint of the UBench authentication server:
+
+| Environment | Token endpoint |
+|-------------|----------------|
+| Approval    | `https://approval.ubenchinternational.com/auth/realms/ubench-api/protocol/openid-connect/token` |
+| Production  | `https://www.ubench.com/auth/realms/ubench-api/protocol/openid-connect/token` |
+
+```bash
+curl -X POST "https://approval.ubenchinternational.com/auth/realms/ubench-api/protocol/openid-connect/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "grant_type=client_credentials" \
+  --data-urlencode "client_id=ws-your-client-id-1234-5678-90ab-cdef01234567" \
+  --data-urlencode "client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" \
+  --data-urlencode "client_assertion=<signed-jwt-token>"
+```
+
+The URL has the format `<server>/auth/realms/<realm>/protocol/openid-connect/token`. All examples in this README use the realm `ubench-api`.
+
+> [!NOTE]
+> _The realm can be `ubcall` as well. In that case, replace `ubench-api` with `ubcall` in the URL (and in the `aud` claim of the signed JWT token), and you must also request the scope `ubcall-api-service` by adding the parameter `scope=ubcall-api-service` to the message:_
+> ```bash
+> curl -X POST "https://approval.ubenchinternational.com/auth/realms/ubcall/protocol/openid-connect/token" \
+>   -H "Content-Type: application/x-www-form-urlencoded" \
+>   --data-urlencode "grant_type=client_credentials" \
+>   --data-urlencode "client_id=ws-your-client-id-1234-5678-90ab-cdef01234567" \
+>   --data-urlencode "client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" \
+>   --data-urlencode "client_assertion=<signed-jwt-token>" \
+>   --data-urlencode "scope=ubcall-api-service"
+> ```
+
 #### Signed JWT token <!-- omit in toc -->
 You can see that the message contains a signed JWT token as `client_assertion`. This token is signed with your private key. The UBench authentication server will use your public key to verify the signature of the JWT token.
 
