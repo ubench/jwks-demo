@@ -1,5 +1,5 @@
 import fs from 'fs';
-import jose from 'node-jose';
+import { SignJWT } from 'jose';
 import chalk from 'chalk';
 import {colorize} from 'json-colorizer';
 import yargs from 'yargs';
@@ -63,11 +63,9 @@ async function generateSignedJwt({ kid, privateKey }, clientId) {
         exp: now + 600
     };
 
-    const token = await jose.JWS.createSign({ format: 'compact', fields: header }, privateKey)
-        .update(JSON.stringify(claims))
-        .final();
-    
-    return token;
+    return await new SignJWT(claims)
+        .setProtectedHeader(header)
+        .sign(privateKey);
 }
 
 async function requestAccessToken(clientId) {

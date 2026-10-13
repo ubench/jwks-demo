@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-// node-jose accepts both PEM encodings, so the demo must keep accepting both.
+// The demo has always accepted both PEM encodings and must keep doing so.
 const PEM_ENCODINGS = {
     pkcs8: { type: 'pkcs8', format: 'pem' },
     pkcs1: { type: 'pkcs1', format: 'pem' },
