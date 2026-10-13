@@ -1,9 +1,9 @@
 import express from 'express';
 import fs from 'fs';
-import jose from 'node-jose';  // Changed to default import
 import chalk from 'chalk';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+import { loadRsaKey } from './keys.js';
 
 // Parse command line arguments
 const argv = yargs(hideBin(process.argv))
@@ -32,27 +32,10 @@ app.use((req, res, next) => {
     next();
 });
 
-// Read and convert PEM to JWK
-async function readPemKey() {
-    const pemData = fs.readFileSync(keyPath, 'utf8');
-    const keystore = await jose.JWK.createKeyStore();
-    return await keystore.add(Buffer.from(pemData), 'pem');
-}
-
-// Get public and private keys
-function getKeysFrom(key) {
-    return {
-        ...key.toJSON(false),  // Include key parameters
-        alg: 'RS256',
-        use: 'sig'
-    };
-}
-
 // Define JWKS endpoint
 app.get('/.well-known/jwks.json', async (req, res) => {
-    const key = await readPemKey();
-    const publicKey = getKeysFrom(key);
-    res.json({ keys: [publicKey] });
+    const { publicJwk } = await loadRsaKey(keyPath);
+    res.json({ keys: [{ ...publicJwk, alg: 'RS256', use: 'sig' }] });
 });
 
 // Start server

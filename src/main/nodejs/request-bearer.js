@@ -6,6 +6,7 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import fetch from 'node-fetch';
 import { v4 as uuidv4 } from 'uuid';
+import { loadRsaKey } from './keys.js';
 
 const argv = yargs(hideBin(process.argv))
     .option('auth-host', {
@@ -45,12 +46,12 @@ if (!fs.existsSync(keyPath)) {
     process.exit(1);
 }
 
-async function generateSignedJwt(key, clientId) {
+async function generateSignedJwt({ kid, privateKey }, clientId) {
     const now = Math.floor(Date.now() / 1000);
     
     const header = {
         alg: 'RS256',
-        kid: selfHosted ? key.kid : undefined
+        kid: selfHosted ? kid : undefined
     };
 
     const claims = {
@@ -62,7 +63,7 @@ async function generateSignedJwt(key, clientId) {
         exp: now + 600
     };
 
-    const token = await jose.JWS.createSign({ format: 'compact', fields: header }, key)
+    const token = await jose.JWS.createSign({ format: 'compact', fields: header }, privateKey)
         .update(JSON.stringify(claims))
         .final();
     
@@ -71,11 +72,7 @@ async function generateSignedJwt(key, clientId) {
 
 async function requestAccessToken(clientId) {
     try {
-        const pemData = fs.readFileSync(keyPath, 'utf8');
-        const keystore = await jose.JWK.createKeyStore();
-        const key = await keystore.add(Buffer.from(pemData), 'pem');
-        
-        const signedJwt = await generateSignedJwt(key, clientId);
+        const signedJwt = await generateSignedJwt(await loadRsaKey(keyPath), clientId);
         
         const data = new URLSearchParams({
             'grant_type': 'client_credentials',
